@@ -1,23 +1,43 @@
 <template>
-  <ul>
-    <li v-for="comment in comments" :key="comment.id">
-      <CommentItem :comment="comment" />
-    </li>
-  </ul>
+  <div class="comment">
+    <p><strong>{{ name }}</strong> ({{ email }})</p>
+    <p>{{ text }}</p>
+    <p>{{ formattedDate }}</p>
+
+    <button @click="$emit('delete')">Удалить</button>
+  </div>
 </template>
 
-<script>
-import { ref } from 'vue';
-import CommentItem from './CommentItem.vue';
+<script setup>
+import { defineProps, defineEmits, computed } from 'vue'
+import { format } from 'date-fns'
 
-export default {
-  name: 'CommentList',
-  components: {
-    CommentItem
+// определяем пропсы
+const props = defineProps({
+  name: {
+    type: String,
+    required: true
   },
-  setup() {
-    const comments = ref([]);  // Замените это настоящими данными из вашего магазина Pinia
-    return { comments };
+  email: {
+    type: String,
+    required: true
+  },
+  text: {
+    type: String,
+    required: true
+  },
+  date: {
+    type: Date,
+    required: true
   }
-}
+})
+
+// определяем эмиттер
+const emit = defineEmits(['delete'])
+
+// создаем вычисляемое свойство
+const formattedDate = computed(() => {
+  return format(props.date, 'dd.MM.yyyy')
+})
 </script>
+
