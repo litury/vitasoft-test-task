@@ -85,6 +85,7 @@ function fetchPost() {
   }, 1000)
 }
 
+
 function editPost() {
   editMode.value = true
 }
