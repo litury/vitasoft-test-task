@@ -1,15 +1,17 @@
 <template>
   <div class="home">
-    <h2>Список записей</h2>
-    <div class="posts">
+    <h2 class="home__title">Список записей</h2>
+
+    <div class="home__posts posts">
       <PostItem
           v-for="post in sortedPosts"
           :key="post.id"
           :id="post.id"
           :title="post.title"
-          :content="post.content"
+          :summary="post.summary"
           :date="post.date"
-          :comments="post.comments"
+
+          :comments="comments"
       />
     </div>
   </div>
@@ -18,14 +20,15 @@
 <script setup>
 import PostItem from "./PostItem.vue";
 
-import { ref, computed, onMounted } from 'vue'
-import { usePinia } from 'pinia'
+import {ref, computed, onMounted} from 'vue'
+import {usePostsStore} from "../stores/postsStore";
 
 // получаем доступ к хранилищу Pinia
-const pinia = usePinia()
+const postsStore = usePostsStore()
 
 // создаем реактивное свойство
 const posts = ref([])
+const comments = ref([])
 
 // создаем вычисляемое свойство для сортировки постов по дате
 const sortedPosts = computed(() => {
@@ -34,11 +37,16 @@ const sortedPosts = computed(() => {
 
 // создаем метод
 function fetchPosts() {
-  // здесь можно использовать Pinia для получения данных из хранилища
-  // или Axios для отправки запросов к API
-  // для простоты мы просто имитируем асинхронный запрос с помощью setTimeout
+  console.log(posts.value)
+  console.log(comments.value)
+
+  // Имитируем асинхронный запрос с помощью setTimeout
   setTimeout(() => {
-    posts.value = pinia.store.posts.getAll()
+    posts.value = postsStore.getPosts
+    comments.value = postsStore.getComments
+
+    console.log(posts.value)
+    console.log(comments.value.length)
   }, 1000)
 }
 
@@ -47,3 +55,22 @@ onMounted(() => {
   fetchPosts()
 })
 </script>
+
+<style scoped>
+.home {
+  padding: 20px;
+}
+
+.home__title {
+  color: black;
+  text-shadow: 0 0 5px #00ff00;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.home__posts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-gap: 20px;
+}
+</style>
