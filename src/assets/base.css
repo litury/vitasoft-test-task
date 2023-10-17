@@ -1,0 +1,68 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  font-weight: normal;
+}
+
+/* Сбросить все стили для элемента select */
+select {
+  all: unset;
+}
+
+/* Сбросить все стили для кнопки */
+button {
+  all: unset;
+}
+
+/* Сбросить все стили для ссылки */
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Сбросить все стили для списка */
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Сбросить все стили для заголовков */
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-weight: normal;
+}
+
+/* Сбросить все стили для параграфа */
+p {
+  margin: 0;
+}
+
+/* Сбросить все стили для формы */
+form {
+  margin: 0;
+}
+
+/* Сбросить все стили для таблицы */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* Сбросить все стили для изображения */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+body {
+  min-height: 100vh;
+  text-align: center;
+  font-family: sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+}
