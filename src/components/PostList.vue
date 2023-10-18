@@ -73,4 +73,10 @@ onMounted(() => {
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   grid-gap: 20px;
 }
+
+@media (max-width: 576px) {
+  .home__posts {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}
 </style>

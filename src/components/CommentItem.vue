@@ -60,6 +60,17 @@ const emit = defineEmits(['delete'])
   margin-bottom: 5px;
 }
 
+@media (max-width: 768px) {
+  .comment__info {
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+}
+
 .comment__name {
   color: black;
   text-shadow: 0 0 5px #00ff00;

@@ -51,6 +51,13 @@
   text-shadow: 0 0 5px #00ff00;
   transition: color 0.3s ease-in-out;
 }
+
+@media (max-width: 376px) {
+  .nav__link {
+    font-size: 16px;
+  }
+}
+
 .nav__link:hover {
   color: #00ff00;
 }
