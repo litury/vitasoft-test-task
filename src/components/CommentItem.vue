@@ -9,17 +9,24 @@
       </span>
     </p>
     <p class="comment__text">{{ text }}</p>
-    <p class="comment__date">{{ date }}</p>
-    <button class="comment__button" @click="$emit('delete')">Удалить</button>
+    <p class="comment__date">{{ formattedDate }}</p>
+
+    <button class="comment__button" @click="deleteComment(id)">Удалить</button>
   </div>
 </template>
 
 <script setup>
 import {defineProps, defineEmits, computed} from 'vue'
-import {format} from 'date-fns'
+import {format, parseISO} from 'date-fns'
+
+import {usePostsStore} from "../stores/postsStore";
 
 // определяем пропсы
 const props = defineProps({
+  id: {
+    type: String,
+    required: true
+  },
   name: {
     type: String,
     required: true
@@ -41,17 +48,36 @@ const props = defineProps({
 // определяем эмиттер
 const emit = defineEmits(['delete'])
 
-// создаем вычисляемое свойство
-// const formattedDate = computed(() => {
-//   return format(props.date, 'dd.MM.yyyy')
-// })
+// получаем доступ к хранилищу Pinia
+const postsStore = usePostsStore()
+
+
+// функция удаления комментария
+const deleteComment = (id) => {
+
+  // вызываем мутацию удаления комментария
+  postsStore.deleteComment(id)
+
+  // вызываем эмиттер
+  emit('delete')
+}
+
+
+const formattedDate = computed(() => {
+
+  const dateObject = parseISO(props.date)
+
+  return format(dateObject, 'dd.MM.yyyy')
+})
 </script>
 
 <style>
 .comment {
   padding: 10px;
-  background-color: #ffffff;
-  border-top: 1px solid #00ff00;
+  background: #fef6e4;
+  border-top: 1px solid #8bd3dd;
+  margin-bottom: 8px;
+  border-radius: 16px;
 }
 
 .comment__info {
@@ -60,30 +86,21 @@ const emit = defineEmits(['delete'])
   margin-bottom: 5px;
 }
 
-@media (max-width: 768px) {
-  .comment__info {
-    font-size: 12px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-  }
-}
 
 .comment__name {
-  color: black;
-  text-shadow: 0 0 5px #00ff00;
+  color: #001858;
+  font-size: 12px;
   font-weight: bold;
   margin-right: 20px;
 }
 
 .comment__email {
-  color: #999999;
+  color: #001858;
+  font-size: 12px;
 }
 
 .comment__text {
-  color: #000000;
+  color: #001858;
   font-size: 16px;
   margin-bottom: 5px;
 }
@@ -95,13 +112,14 @@ const emit = defineEmits(['delete'])
 }
 
 .comment__button {
-  color: #ffffff;
-  background-color: #00ff00;
+
+
   border: none;
   border-radius: 5px;
   padding: 5px 10px;
   cursor: pointer;
-  transition: background-color
+  color: #001858;
+  background-color: #f582ae;
 }
 
 .comment__button:hover {

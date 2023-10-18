@@ -2,7 +2,10 @@
   <div class="home">
     <h2 class="home__title">Список записей</h2>
 
-    <div class="home__posts posts">
+
+    <Loader v-if="loading"/>
+
+    <div v-else class="home__posts posts">
       <PostItem
           v-for="post in sortedPosts"
           :key="post.id"
@@ -19,6 +22,7 @@
 
 <script setup>
 import PostItem from "./PostItem.vue";
+import Loader from "./Loader.vue";
 
 import {ref, computed, onMounted} from 'vue'
 import {usePostsStore} from "../stores/postsStore";
@@ -30,6 +34,9 @@ const postsStore = usePostsStore()
 const posts = ref([])
 const comments = ref([])
 
+// props
+const loading = ref(false)
+
 // создаем вычисляемое свойство для сортировки постов по дате
 const sortedPosts = computed(() => {
   return posts.value.sort((a, b) => b.date - a.date)
@@ -37,17 +44,15 @@ const sortedPosts = computed(() => {
 
 // создаем метод
 function fetchPosts() {
-  console.log(posts.value)
-  console.log(comments.value)
+  loading.value = true
 
   // Имитируем асинхронный запрос с помощью setTimeout
   setTimeout(() => {
     posts.value = postsStore.getPosts
     comments.value = postsStore.getComments
 
-    console.log(posts.value)
-    console.log(comments.value.length)
-  }, 1000)
+    loading.value = false
+  }, 2000)
 }
 
 // используем хук жизненного цикла
@@ -62,8 +67,7 @@ onMounted(() => {
 }
 
 .home__title {
-  color: black;
-  text-shadow: 0 0 5px #00ff00;
+  color: #001858;
   font-size: 24px;
   margin-bottom: 10px;
 }

@@ -2,20 +2,19 @@
   <div class="post">
     <h3 class="post__title">{{ title }}</h3>
     <p class="post__content">{{ summary }}</p>
-    <p class="post__date">{{ date }}</p>
+    <p class="post__date">{{ formattedDate }}</p>
 
-    <p class="post__comments">{{ comments.length }} комментариев</p>
+    <p class="post__comments">{{ filteredComments.length }} комментариев</p>
 
     <router-link class="post__link" :to="{ name: 'PostDetail', params: { id } }">Подробнее</router-link>
-
   </div>
 </template>
 
 <script setup>
 
-import {defineProps, defineEmits, computed} from 'vue'
+import {defineProps, defineEmits, computed, onMounted} from 'vue'
 import {useRouter, useRoute} from 'vue-router'
-import {format} from 'date-fns'
+import {format, parseISO} from 'date-fns'
 
 // определяем пропсы
 const props = defineProps({
@@ -41,13 +40,20 @@ const props = defineProps({
   }
 })
 
-// определяем эмиттеры
-const emit = defineEmits(['edit', 'delete'])
+const filteredComments = computed(() => {
 
-// // создаем вычисляемое свойство
-// const formattedDate = computed(() => {
-//   return format(props.date, 'dd.MM.yyyy')
-// })
+  return props.comments.filter(comment => comment.postId == props.id)
+})
+
+// создаем вычисляемое свойство
+const formattedDate = computed(() => {
+
+  const dateObject = parseISO(props.date)
+
+  return format(dateObject, 'dd.MM.yyyy')
+})
+
+console.log(props.date)
 
 // получаем доступ к роутеру
 const router = useRouter()
@@ -61,26 +67,32 @@ function nameRouter() {
   const r = route.name === 'PostDetail'
 }
 
+onMounted(() => {
+  console.log('mounted')
+})
+
+
 </script>
 
 <style>
 .post {
-  padding: 15px;
-  background-color: #ffffff;
-  border: 2px solid #00ff00;
-  border-radius: 5px;
-  box-shadow: inset 0 0 5px rgba(0, 255, 0, 0.3);
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid #000;
+
+  background: #FFF2F2;
+
+  box-shadow: 3px 4px 4px 0px rgba(0, 0, 0, 0.29);
 }
 
 .post__title {
-  color: black;
-  text-shadow: 0 0 5px #00ff00;
-  font-size: 18px;
+  color: #001858;
+  font-size: 24px;
   margin-top: 0;
 }
 
 .post__content {
-  color: #000000;
+  color: #001858;
   font-size: 16px;
   margin: 10px;
 }
@@ -98,7 +110,7 @@ function nameRouter() {
 }
 
 .post__link {
-  color: #00ff00;
+  color: #f582ae;
   text-decoration: none;
   font-size: 16px;
   font-weight: bold;

@@ -27,13 +27,15 @@ function initializeData() {
 	
 	const initialPosts = [
 		createPost(1, 'Первый пост', 'Это краткое описание первого поста', 'Это полное описание первого поста', '2023-10-01'),
-		createPost(2, 'Второй пост', 'Это краткое описание второго поста', 'Это полное описание второго поста', '2023-10-02')
+		createPost(2, 'Второй пост', 'Это краткое описание второго поста', 'Это полное описание второго поста', '2023-10-02'),
 	];
 	localStorage.setItem('posts', JSON.stringify(initialPosts));
 	
 	const initialComments = [
 		createComment(1, 1, 'Иван Иванов', 'ivan@example.com', 'Комментарий к первому посту', '2023-10-03'),
-		createComment(2, 2, 'Петр Петров', 'petr@example.com', 'Комментарий ко второму посту', '2023-10-04')
+		createComment(2, 2, 'Петр Петров', 'petr@example.com', 'Комментарий ко второму посту', '2023-10-04'),
+		createComment(3, 2, 'Петр Петров', 'petr@example.com', 'Комментарий ко второму посту', '2023-10-04'),
+		createComment(4, 2, 'Петр Петров', 'petr@example.com', 'Комментарий ко второму посту', '2023-10-04')
 	];
 	localStorage.setItem('comments', JSON.stringify(initialComments));
 }
@@ -43,6 +45,8 @@ export const usePostsStore = defineStore({
 	
 	// начальное состояние
 	state: () => {
+		
+		
 		
 		// Проверка наличия данных в local storage и инициализация начальных данных при необходимости
 		if (!localStorage.getItem('posts') || !localStorage.getItem('comments')) {
@@ -56,6 +60,8 @@ export const usePostsStore = defineStore({
 		};
 	},
 	
+	
+	
 	actions: {
 		
 		// Добавление нового поста
@@ -67,14 +73,19 @@ export const usePostsStore = defineStore({
 				postData.content,
 				postData.date,
 			);
+			
 			this.posts.push(post);
 			localStorage.setItem('posts', JSON.stringify(this.posts));
+			
 		},
 		
 		// Редактирование поста
 		editPost(postId, updatedPostData) {
+			
 			const index = this.posts.findIndex(post => post.id === postId);
+			
 			if (index !== -1) {
+				
 				this.posts[index] = {...this.posts[index], ...updatedPostData};
 				localStorage.setItem('posts', JSON.stringify(this.posts));
 			}
@@ -82,8 +93,11 @@ export const usePostsStore = defineStore({
 		
 		// Удаление поста
 		deletePost(postId) {
+			
 			this.posts = this.posts.filter(post => post.id !== postId);
 			localStorage.setItem('posts', JSON.stringify(this.posts));
+			
+			console.log('Пост удален')
 		},
 		
 		// Добавление нового комментария
@@ -96,12 +110,17 @@ export const usePostsStore = defineStore({
 				commentData.text,
 				commentData.date,
 			);
+			
+			console.log(comment);
+			console.log('Комментарий добавлен');
+			
 			this.comments.push(comment);
 			localStorage.setItem('comments', JSON.stringify(this.comments));
 		},
 		
 		// Удаление комментария
 		deleteComment(commentId) {
+			console.log(commentId);
 			this.comments = this.comments.filter(comment => comment.id !== commentId);
 			localStorage.setItem('comments', JSON.stringify(this.comments));
 		}
@@ -126,7 +145,9 @@ export const usePostsStore = defineStore({
 		
 		// Получение комментариев по id поста
 		getCommentsByPostId: (state) => (postId) => {
-			return state.comments.filter(comment => comment.postId === postId);
+
+			
+			return state.comments.filter(comment => comment.postId == postId);
 		}
 	}
 })

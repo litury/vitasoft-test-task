@@ -35,11 +35,18 @@ import * as yup from 'yup'
 const postsStore = usePostsStore()
 const route = useRoute()
 
+const id = route.params.id
+
+const postId = ref(id)
+
 // создаем реактивное состояние
 const form = reactive({
+  id: id,
+  postId: postId.value,
   name: '',
   email: '',
-  text: ''
+  text: '',
+  date: new Date().toISOString().slice(0, 10),
 })
 
 const errors = reactive({
@@ -59,10 +66,10 @@ const schema = computed(() => {
 
 // создаем метод
 function submitForm() {
-  // здесь можно использовать Pinia для добавления данных в хранилище
-  // или Axios для отправки запросов к API
-  // для простоты мы просто имитируем асинхронный запрос с помощью setTimeout
+
+  // Имитируем асинхронный запрос с помощью setTimeout
   setTimeout(() => {
+
     // сбрасываем ошибки валидации
     errors.name = ''
     errors.email = ''
@@ -71,7 +78,8 @@ function submitForm() {
     schema.value.validate(form, {abortEarly: false})
         .then(() => {
           // если форма валидна, добавляем комментарий в хранилище
-          pinia.store.posts.addComment(route.params.id, form)
+          postsStore.addComment(form)
+
           // очищаем форму
           form.name = ''
           form.email = ''
@@ -90,15 +98,17 @@ function submitForm() {
 <style scoped>
 
 .comment-form {
-  padding: 10px;
-  background-color: #ffffff;
-  border-top: 1px solid #00ff00;
+  padding: 16px;
+  border: 1px solid #000;
+  border-radius: 16px;
+  background: #FFF2F2;
+  margin-top: 32px;
+  box-shadow: 3px 4px 4px 0px rgba(0, 0, 0, 0.29);
 }
 
 .comment-form__title {
-  color: #00ff00;
-  text-shadow: 0 0 5px #00ff00;
-  font-size: 18px;
+  color: #001858;
+  font-size: 24px;
   margin-bottom: 10px;
 }
 
@@ -115,7 +125,7 @@ function submitForm() {
 
 .comment-form__label {
   color: #000000;
-  font-size: 14px;
+  font-size: 16px;
   display: block;
   margin-bottom: 5px;
 }
@@ -123,7 +133,7 @@ function submitForm() {
 .comment-form__input {
   width: 100%;
   padding: 10px;
-  border: 2px solid #00ff00;
+  border: 2px solid #8bd3dd;
   border-radius: 5px;
   font-size: 16px;
 }
@@ -131,7 +141,7 @@ function submitForm() {
 .comment-form__textarea {
   width: 100%;
   padding: 10px;
-  border: 2px solid #00ff00;
+  border: 2px solid #8bd3dd;
   border-radius: 5px;
   font-size: 16px;
   resize: none;
@@ -144,8 +154,8 @@ function submitForm() {
 }
 
 .comment-form__button {
-  color: #ffffff;
-  background-color: #00ff00;
+  color: #001858;
+  background-color: #f582ae;
   border: none;
   border-radius: 5px;
   padding: 5px 10px;

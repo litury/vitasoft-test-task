@@ -4,12 +4,13 @@
 
     <h2 class="post-detail__title">Детали записи</h2>
 
+
     <div v-if="editMode" class="post-detail__edit">
       <input class="post-detail__input" v-model="title" type="text"/>
       <textarea class="post-detail__textarea" v-model="content" rows="10"></textarea>
 
       <div class="post-detail__buttons">
-        <button class="post-detail__button" @click="saveChanges">Сохранить</button>
+        <button class="post-detail__button" @click="saveChanges(id)">Сохранить</button>
         <button class="post-detail__button" @click="cancelChanges">Отменить</button>
       </div>
     </div>
@@ -20,9 +21,10 @@
       <p class="post-detail__content">{{ content }}</p>
       <p class="post-detail__date">{{ date }}</p>
 
+      <Loader v-if="loading"/>
       <div class="post-detail__buttons">
         <button class="post-detail__button" @click="editPost">Редактировать</button>
-        <button class="post-detail__button" @click="deletePost(id)">Удалить</button>
+        <button class="post-detail__button" @click="deletePostById(id)">Удалить</button>
       </div>
     </div>
 
@@ -31,6 +33,7 @@
     <CommentItem
         v-for="comment in comments"
         :key="comment.id"
+        :id="comment.id"
         :name="comment.name"
         :email="comment.email"
         :text="comment.text"
@@ -47,43 +50,58 @@
 
 import {ref, reactive, computed, watch, onMounted} from 'vue'
 import {usePostsStore} from "../stores/postsStore";
-import {useRoute} from 'vue-router'
+import {useRoute, useRouter} from 'vue-router'
 
 import CommentItem from "./CommentItem.vue";
 import CommentForm from "./CommentForm.vue";
+import Loader from "./Loader.vue";
 
 // получаем доступ к хранилищу Pinia и текущему маршруту
 const postsStore = usePostsStore()
 const route = useRoute()
+const router = useRouter()
 
 // создаем реактивное свойство и состояние
 const post = ref({})
-const comments = ref([])
+// const comments = ref([])
+
+const comments = computed(() => {
+  return postsStore.getCommentsByPostId(Number(route.params.id))
+})
 
 const editMode = ref(false)
 
+
+const loading = ref(false)
+
 // создаем вычисляемые свойства
 const id = computed(() => post.value.id)
-const summary = computed(() => post.value.summary)
-const title = computed(() => post.value.title)
-const content = computed(() => post.value.content)
-const date = computed(() => post.value.date)
 
+const title = ref('')
+const summary = ref('')
+const content = ref('')
+
+const date = computed(() => post.value.date)
 
 // создаем методы
 function fetchPost() {
   // здесь можно использовать Pinia для получения данных из хранилища
   // или Axios для отправки запросов к API
 
+  loading.value = true
   // для простоты мы просто имитируем асинхронный запрос с помощью setTimeout
   setTimeout(() => {
     post.value = postsStore.getPost(Number(route.params.id))
-    comments.value = postsStore.getCommentsByPostId(Number(route.params.id))
 
-    console.log(post.value)
-    console.log(comments.value)
-  }, 1000)
+    title.value = post.value.title
+    summary.value = post.value.summary
+    content.value = post.value.content
+
+    loading.value = false
+
+  }, 2000)
 }
+
 
 
 function editPost() {
@@ -92,23 +110,30 @@ function editPost() {
 
 
 // Функция удаления поста
-function deletePost(id) {
-  console.log(id)
+async function deletePostById(id) {
+ await postsStore.deletePost(id)
+  console.log('удален')
 
+  // переходим на главную страницу
+  router.push('/')
 }
 
 
 
-function saveChanges() {
+function saveChanges(id) {
+
+  console.log(id)
   // здесь можно использовать Pinia для обновления данных в хранилище
   // или Axios для отправки запросов к API
 
   // для простоты мы просто имитируем асинхронный запрос с помощью setTimeout
   setTimeout(() => {
-    pinia.store.posts.updateById(id.value, {
+    postsStore.editPost(id, {
       title: title.value,
       content: content.value
     })
+
+
     editMode.value = false
   }, 1000)
 }
@@ -131,13 +156,18 @@ onMounted(() => {
 
 <style>
 .post-detail {
-  padding: 20px;
+  padding: 24px;
 }
 
 .post-detail__title {
-  color: black;
-  text-shadow: 0 0 5px #00ff00;
+  color: #001858;
   font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.post-detail__summary {
+  color: #001858;
+  font-size: 16px;
   margin-bottom: 10px;
 }
 
@@ -150,7 +180,7 @@ onMounted(() => {
 .post-detail__input {
   width: 80%;
   padding: 10px;
-  border: 2px solid #00ff00;
+  border: 2px solid #8bd3dd;
   border-radius: 5px;
   font-size: 18px;
   margin-bottom: 10px;
@@ -159,7 +189,7 @@ onMounted(() => {
 .post-detail__textarea {
   width: 80%;
   padding: 10px;
-  border: 2px solid #00ff00;
+  border: 2px solid #8bd3dd;
   border-radius: 5px;
   font-size: 16px;
   margin-bottom: 10px;
@@ -170,6 +200,12 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 15px;
+  border: 1px solid #000;
+  border-radius: 16px;
+  background: #FFF2F2;
+
+  box-shadow: 3px 4px 4px 0px rgba(0, 0, 0, 0.29);
 }
 
 .post-detail__content {
@@ -185,13 +221,14 @@ onMounted(() => {
 }
 
 .post-detail__button {
-  color: #ffffff;
-  background-color: #00ff00;
+  color: #001858;
+  background-color: #f582ae;
   border: none;
   border-radius: 5px;
   padding: 5px 10px;
   cursor: pointer;
-  transition: background-color
+  transition: background-color;
+  font-size: 12px;
 }
 
 .post-detail__button:hover {
@@ -207,9 +244,9 @@ onMounted(() => {
 }
 
 .post-detail__comments-title {
-  color: black;
-  text-shadow: 0 0 5px #00ff00;
-  font-size: 20px;
+  color: #8bd3dd;
+
+  font-size: 16px;
   margin-top: 20px;
   margin-bottom: 10px;
 }
