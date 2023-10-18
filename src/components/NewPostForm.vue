@@ -170,6 +170,7 @@ function submitForm() {
 .post-form__button {
   color: #001858;
   background-color: #f582ae;
+
   border: none;
   border-radius: 5px;
   padding: 5px 10px;
